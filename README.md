@@ -1,4 +1,4 @@
-<img src="assets/header_fourierflow.jpg" />
+<img src="assets/header_fourierflow.gif" />
 <hr>
 <p align="center">
 <b style="font-size:30vw;">Ocean subgrid parameterization in an indealized model using machine learning</b>
@@ -40,4 +40,3 @@ conda activate TFE
 ```
 pip install --editable .
 ```
-
