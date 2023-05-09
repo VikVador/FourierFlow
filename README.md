@@ -17,9 +17,6 @@ The reason behind the creation of this repository is to have something simpler a
 <b style="font-size:1.5vw;">Fourier Neural Operator</b>
 </p>
 <hr>
-This is an illustration on how to import the **2D module** used in their paper:
-
-
 ```python
 import fourierflow.FourierNeuralOperator._2D_.Base as FNO_2D
 
@@ -37,7 +34,7 @@ model = FNO_2D.FNO(input_channels = 3,
 			width = 32,
 			n_layers = 4)
 ```
-
+<img src="assets/fno.png" />
 <hr>
 <p align="center">
 <b style="font-size:1.5vw;">Factorized Fourier Neural Operator</b>
@@ -77,7 +74,7 @@ model = FFNO_2D.FFNO(input_dim = 3,
 			layer_norm  = False)
 ```
 
-
+<img src="assets/ffno.png" />
 <hr>
 <p  style="font-size:1.5vw; font-weight:bold;" align="center">
 Original Papers & GitHubs
