@@ -81,9 +81,11 @@ model = FFNO_2D.FFNO(input_dim = 3,
 Installation
 </p>
 <hr>
+
 ```
 pip install git+https://github.com/VikVador/FourierFlow
 ```
+
 <hr>
 <p  style="font-size:1.5vw; font-weight:bold;" align="center">
 Original Papers & GitHubs
