@@ -10,7 +10,7 @@ In this repository, you will find the code for the:
 
 - Factorized Fourier Neural Operators (**FFNO**) : Base, Time Dependant  (V1/V2), & Cloud point
 
-The reason behind the creation of this repository is to have something simpler and more convenient to install than what is available online. It is important to notice that I do not own the credit of most of the code and I acknowledge it !
+The reason behind the creation of this repository is to have something simpler and more convenient to install than what is available online. It is important to notice that I do not own the credit of most of the code !
 
 <hr>
 <p align="center">
@@ -77,28 +77,6 @@ model = FFNO_2D.FFNO(input_dim = 3,
 
 <img src="assets/ffno.png" />
 <hr>
-<p  style="font-size:1.5vw; font-weight:bold;" align="center">
-Original Papers & GitHubs
-</p>
-<hr>
-The authors of this remastered code are :
-
-                            Zongyi Li and Daniel Zhengyu Huang
-
- This code is based on the papers :
-
-                        Factorized Fourier Neural Operators
-                        (https://arxiv.org/abs/2111.13802)
-
-                Fourier Neural Operator for Parametric Partial Differential Equations
-                            (https://arxiv.org/abs/2010.08895)
-
- and comes from:
-
-                   https://github.com/alasdairtran/fourierflow
-
-                 https://github.com/neuraloperator/neuraloperator
-<hr>
 <p  style="font-size:20px; font-weight:bold;" align="center">
 Installation
 </p>
@@ -110,3 +88,21 @@ pip install git+https://github.com/VikVador/FourierFlow
 ```
 
 be careful that you should already have torch, numpy and einops installed in your envs.
+<hr>
+<p  style="font-size:1.5vw; font-weight:bold;" align="center">
+Original Papers & GitHubs
+</p>
+<hr>
+The authors of this remastered code are Zongyi Li and Daniel Zhengyu Huang ! This code is based on the papers :
+
+                          Factorized Fourier Neural Operators
+                          (https://arxiv.org/abs/2111.13802)
+
+                  Fourier Neural Operator for Parametric Partial Differential Equations
+                              (https://arxiv.org/abs/2010.08895)
+
+ and comes from:
+
+                    https://github.com/alasdairtran/fourierflow
+
+                  https://github.com/neuraloperator/neuraloperator
