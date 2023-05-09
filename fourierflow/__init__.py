@@ -1,2 +1,2 @@
 from .linear      import GehringLinear, WNLinear
-#from .feedforward import FeedForward
+from .feedforward import FeedForward

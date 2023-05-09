@@ -81,13 +81,9 @@ model = FFNO_2D.FFNO(input_dim = 3,
 Installation
 </p>
 <hr>
-You can simply install this library using the following command:
-
 ```
 pip install git+https://github.com/VikVador/FourierFlow
 ```
-
-be careful that you should already have torch, numpy and einops installed in your envs.
 <hr>
 <p  style="font-size:1.5vw; font-weight:bold;" align="center">
 Original Papers & GitHubs
