@@ -39,8 +39,8 @@ import torch.nn as nn
 from einops        import rearrange
 
 # --------- Own ---------
-from ..feedforward import FeedForward
-from ..linear      import WNLinear
+from ...feedforward import FeedForward
+from ...linear      import WNLinear
 
 # -----------------------------------------------------
 #                      Functions
