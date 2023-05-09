@@ -17,6 +17,7 @@ The reason behind the creation of this repository is to have something simpler a
 <b style="font-size:1.5vw;">Fourier Neural Operator</b>
 </p>
 <hr>
+
 ```python
 import fourierflow.FourierNeuralOperator._2D_.Base as FNO_2D
 
