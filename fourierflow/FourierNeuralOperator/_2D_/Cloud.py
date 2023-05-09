@@ -15,8 +15,8 @@
 #                    Zongyi Li and Daniel Zhengyu Huang
 #
 # This code is based on the papers :
-# 
-#                      Factorized Fourier Neural Operators 
+#
+#                      Factorized Fourier Neural Operators
 #                       (https://arxiv.org/abs/2111.13802)
 #
 #        Fourier Neural Operator for Parametric Partial Differential Equations
@@ -185,7 +185,7 @@ class SpectralConv2d(nn.Module):
         return Y
 
 
-class FNOPointCloud2D(nn.Module):
+class FNO(nn.Module):
     def __init__(self, modes1, modes2, width, in_channels, out_channels,
                  n_layers=4, is_mesh=True, s1=40, s2=40):
         super().__init__()

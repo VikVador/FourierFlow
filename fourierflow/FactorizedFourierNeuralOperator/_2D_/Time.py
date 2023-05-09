@@ -15,8 +15,8 @@
 #                    Zongyi Li and Daniel Zhengyu Huang
 #
 # This code is based on the papers :
-# 
-#                      Factorized Fourier Neural Operators 
+#
+#                      Factorized Fourier Neural Operators
 #                       (https://arxiv.org/abs/2111.13802)
 #
 #        Fourier Neural Operator for Parametric Partial Differential Equations
@@ -39,8 +39,8 @@ import torch.nn as nn
 from einops import rearrange
 
 # --------- Own ---------
-from ..feedforward import FeedForward
-from ..linear      import WNLinear
+from ...feedforward import FeedForward
+from ...linear      import WNLinear
 
 # -----------------------------------------------------
 #                      Functions
@@ -137,7 +137,7 @@ class SpectralConv2d(nn.Module):
         return x
 
 
-class FNOFactorized2DBlock(nn.Module):
+class FFNO(nn.Module):
     def __init__(self, modes, width, input_dim=12, dropout=0.0, in_dropout=0.0,
                  n_layers=4, share_weight: bool = False,
                  share_fork=False, factor=2,
