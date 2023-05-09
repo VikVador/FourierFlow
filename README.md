@@ -25,17 +25,17 @@ import fourierflow.FourierNeuralOperator._2D_.Base as FNO_2D
 
 # Loading a spectral convolutional layer
 layer = FNO_2D.SpectralConv2d(in_channels = 3,
-											out_channels = 1,
-													modes1 = 12,
-													modes2 = 12)
+		out_channels = 1,
+		modes1 = 12,
+		modes2 = 12)
 
 # Loading FNO
 model = FNO_2D.FNO(input_channels = 3,
-output_channels = 1,
-modes1 = 12,
-modes2 = 12,
-width = 32,
-n_layers = 4)
+		output_channels = 1,
+		modes1 = 12,
+		modes2 = 12,
+		width = 32,
+		n_layers = 4)
 ```
 
 <hr>
