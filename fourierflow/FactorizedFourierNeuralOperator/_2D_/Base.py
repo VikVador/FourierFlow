@@ -246,7 +246,7 @@ class FFNO(nn.Module):
         self.n_layers  = n_layers
 
         # Lifting layer
-        self.in_proj = WNLinear(input_dim, self.width, wnorm = ff_weight_norm)
+        self.in_proj = WNLinear(input_dim + 2, self.width, wnorm = ff_weight_norm)
 
         # Shared set of weights
         self.fourier_weight = None
