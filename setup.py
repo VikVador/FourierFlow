@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-VERSION          = '1.0.0'
+VERSION          = '1.1.0'
 DESCRIPTION      = 'Fourier Flow'
 LONG_DESCRIPTION = 'Fourier Flow - Contains the Fourier Neural Operator and the Factorized Fourier Neural Operator'
 
