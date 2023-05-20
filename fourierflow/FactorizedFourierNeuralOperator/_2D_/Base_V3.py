@@ -107,7 +107,7 @@ class SpectralConv2d(nn.Module):
             self.fourier_weight = nn.ParameterList([])
 
             # Initialization using Xavier Normal technique
-            for n_modes in [modes_x, modes_y]:
+            for n_modes in [modes_x[1] - modes_x[0], modes_y[1] - modes_y[0]]:
                 weight = torch.FloatTensor(in_dim, out_dim, n_modes, 2)
                 param  = nn.Parameter(weight)
                 nn.init.xavier_normal_(param)
