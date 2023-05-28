@@ -31,9 +31,6 @@ class FeedForward(nn.Module):
         # Saving the total number of layers
         self.nb_layers = n_layers
 
-        # Saving a list with the layers
-        self.layers = list()
-
         # Initialization of the layers
         for i in range(n_layers):
 
@@ -51,7 +48,6 @@ class FeedForward(nn.Module):
 
             # Adding the layer to the module
             setattr(self, f'layer_{i}', l)
-            self.layers.append(getattr(self, f'layer_{i}'))
 
     def forward(self, x):
 

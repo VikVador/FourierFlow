@@ -53,16 +53,17 @@ class SpectralConv2d(nn.Module):
                        out_dim,
                        modes_x,
                        modes_y,
-                 mode = "full",
-               n_ff_layers = 2,
-                    factor = 4,
-                 dropout = 0.1,
-         ff_weight_norm = True,
-              use_fork = False,
-           layer_norm  = False,
-         fourier_weight = None,
-            forecast_ff = None,
-            backcast_ff = None):
+                       mode = "full",
+                n_ff_layers = 2,
+                     factor = 4,
+                    dropout = 0.1,
+            ff_weight_norm  = True,
+                  use_fork  = False,
+               layer_norm   = False,
+           fourier_weight_x = None,
+           fourier_weight_y = None,
+                forecast_ff = None,
+                backcast_ff = None):
         super().__init__()
         """
         Documentation
@@ -71,7 +72,7 @@ class SpectralConv2d(nn.Module):
         - out_dim        : output dimension
         - modes_x        : modes to keep along the x-direction
         - modes_y        : modes to keep along the y-direction
-        - fourier_weight : set of weights shared across layers
+        - fourier_weight : set of weights shared across layers (x and y directions)
         - mode           :
                             - "full"       : FFT + WEIGHTED MODE SELECTION + IFFT + FEEDFORWARD
                             - "filtering"  : FFT + FILTERING + IFFT + FEEDFORWARD
@@ -103,19 +104,17 @@ class SpectralConv2d(nn.Module):
             "(FFNO2D - Spectral convolution) input and output dimension must be equal"
 
         # Initialization
-        self.in_dim         = in_dim
-        self.out_dim        = out_dim
-        self.modes_x        = modes_x
-        self.modes_y        = modes_y
-        self.mode           = mode
-        self.use_fork       = use_fork
-        self.fourier_weight = fourier_weight
+        self.in_dim           = in_dim
+        self.out_dim          = out_dim
+        self.modes_x          = modes_x
+        self.modes_y          = modes_y
+        self.mode             = mode
+        self.use_fork         = use_fork
+        self.fourier_weight_x = fourier_weight_x
+        self.fourier_weight_y = fourier_weight_y
 
         # Shared set of weights
-        if not self.fourier_weight:
-
-            # -- self.fourier_weight = nn.ParameterList([])
-            self.fourier_weight = list()
+        if self.fourier_weight_x is None:
 
             # Initialization using Xavier Normal technique
             for i, n_modes in enumerate([modes_x[1] - modes_x[0], modes_y[1] - modes_y[0]]):
@@ -126,8 +125,10 @@ class SpectralConv2d(nn.Module):
                 nn.init.xavier_normal_(param)
 
                 # Saving weights
-                setattr(self, f'fourier_weight_{i}', param)
-                self.fourier_weight.append(getattr(self, f'fourier_weight_{i}'))
+                if i == 0:
+                    self.fourier_weight_x = param
+                else:
+                    self.fourier_weight_y = param
 
         # Additionnal network at the head of the FFNO block
         if use_fork:
@@ -182,7 +183,7 @@ class SpectralConv2d(nn.Module):
         # ------------- CASE 1 - Weightening -------------
         if self.mode == 'full':
             out_ft[:, :, :, self.modes_y[0]:self.modes_y[1]] = torch.einsum("b i x y, i o y -> b o x y",
-                f_transform[:, :, :, self.modes_y[0]:self.modes_y[1]], torch.view_as_complex(self.fourier_weight[1]))
+                f_transform[:, :, :, self.modes_y[0]:self.modes_y[1]], torch.view_as_complex(self.fourier_weight_y))
 
         # ------------- CASE 2 - Low Pass Filtering -------------
         elif self.mode == 'filtering':
@@ -203,7 +204,7 @@ class SpectralConv2d(nn.Module):
         # ------------- CASE 1 - Weightening -------------
         if self.mode == 'full':
             out_ft[:, :, self.modes_x[0]:self.modes_x[1], :] = torch.einsum("bixy,iox->boxy",
-                f_transform[:, :, self.modes_x[0]:self.modes_x[1], :], torch.view_as_complex(self.fourier_weight[0]))
+                f_transform[:, :, self.modes_x[0]:self.modes_x[1], :], torch.view_as_complex(self.fourier_weight_x))
 
         # ------------- CASE 2 - Low Pass Filtering -------------
         elif self.mode == 'filtering':
@@ -217,6 +218,7 @@ class SpectralConv2d(nn.Module):
         # ----------------------------------------
         x = xx + xy
         x = rearrange(x, 'b i m n -> b m n i')
+
         return x
 
 # -----------------------------------------------------
@@ -271,12 +273,10 @@ class FFNO(nn.Module):
         self.in_proj = WNLinear(input_dim + 2, self.width, wnorm = ff_weight_norm)
 
         # --------- Weights ---------
-        self.fourier_weight = None
+        self.fourier_weight_x = None
+        self.fourier_weight_y = None
 
         if share_weight:
-
-            # Stores all the weights
-            self.fourier_weight = list()
 
             # Initialization using Xavier Normal technique
             for i, n_modes in enumerate([modes_x[1] - modes_x[0], modes_y[1] - modes_y[0]]):
@@ -287,41 +287,39 @@ class FFNO(nn.Module):
                 nn.init.xavier_normal_(param)
 
                 # Saving weights
-                setattr(self, f'ffno_fourier_weight_{i}', param)
-                self.fourier_weight.append(getattr(self, f'ffno_fourier_weight_{i}'))
+                if i == 0:
+                    self.fourier_weight_x = param
+                else:
+                    self.fourier_weight_y = param
 
 
         # --------- Spectral Convolutions ---------
-        self.spectral_layers = list()
-
-        # Initialization of the layers
         for i in range(n_layers):
 
             # Creation of the layer
-            spec_layer = SpectralConv2d(in_dim         = width,
-                                        out_dim        = width,
-                                        modes_x        = modes_x,
-                                        modes_y        = modes_y,
-                                        forecast_ff    = None,
-                                        backcast_ff    = None,
-                                        fourier_weight = self.fourier_weight,
-                                        factor         = factor,
-                                        ff_weight_norm = ff_weight_norm,
-                                        n_ff_layers    = n_ff_layers,
-                                        layer_norm     = layer_norm,
-                                        use_fork       = False,
-                                        dropout        = 0.1,
-                                        mode           = 'full')
+            spec_layer = SpectralConv2d(in_dim           = width,
+                                        out_dim          = width,
+                                        modes_x          = modes_x,
+                                        modes_y          = modes_y,
+                                        forecast_ff      = None,
+                                        backcast_ff      = None,
+                                        fourier_weight_x = self.fourier_weight_x,
+                                        fourier_weight_y = self.fourier_weight_y,
+                                        factor           = factor,
+                                        ff_weight_norm   = ff_weight_norm,
+                                        n_ff_layers      = n_ff_layers,
+                                        layer_norm       = layer_norm,
+                                        use_fork         = False,
+                                        dropout          = 0.1,
+                                        mode             = 'full')
 
             # Saving spectral layer
             setattr(self, f'ffno_spectral_layer_{i}', spec_layer)
-            self.spectral_layers.append(getattr(self, f'ffno_spectral_layer_{i}'))
 
         # --------- Projection Layer ---------
         self.out = nn.Sequential(
             WNLinear(self.width, 128, wnorm = ff_weight_norm),
             WNLinear(128, output_dim, wnorm = ff_weight_norm))
-
 
     def forward(self, x):
         """
@@ -361,11 +359,20 @@ class FFNO(nn.Module):
         return output
 
     def get_grid(self, shape, device):
+        """
+        Documentation
+        -------------
+        Creation of a grid containing coordinates of cells (used by Fourier Transform)
+        """
+        # Retreiving dimensions
         batchsize, size_x, size_y = shape[0], shape[1], shape[2]
-        gridx = torch.tensor(np.linspace(0, 1, size_x), dtype=torch.float)
-        gridx = gridx.reshape(1, size_x, 1, 1).repeat(
-            [batchsize, 1, size_y, 1])
-        gridy = torch.tensor(np.linspace(0, 1, size_y), dtype=torch.float)
-        gridy = gridy.reshape(1, 1, size_y, 1).repeat(
-            [batchsize, size_x, 1, 1])
-        return torch.cat((gridx, gridy), dim=-1).to(device)
+
+        # X-direction
+        gridx = torch.tensor(np.linspace(0, 1, size_x), dtype = torch.float)
+        gridx = gridx.reshape(1, size_x, 1, 1).repeat([batchsize, 1, size_y, 1])
+
+        # Y-direction
+        gridy = torch.tensor(np.linspace(0, 1, size_y), dtype = torch.float)
+        gridy = gridy.reshape(1, 1, size_y, 1).repeat([batchsize, size_x, 1, 1])
+
+        return torch.cat((gridx, gridy), dim = -1).to(device)
